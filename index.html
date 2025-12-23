@@ -46,7 +46,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5bDn1_XWMhmz6qUM2BVsT5hf7Bwx-aUk-0kpjE0aYaY4fmEceeR7zRncEdql5l55A2w/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqPsY-Pyx5E3w72hzxZGI20r-ihDEBhWLnt84IqBmIPSTbN4BVOiw9t-owcBef6vd2Dw/exec";
 
     function loadResult() {
       const examId = document.getElementById("examInput").value.trim();
@@ -56,24 +56,21 @@
         .then(res => res.json())
         .then(data => {
           if (data.error) {
-            if (data.error === "not_found") {
-              alert("الرقم غير موجود");
-            } else {
-              alert("حدث خطأ في جلب البيانات");
-            }
+            if (data.error === "not_found") alert("الرقم غير موجود");
+            else alert("حدث خطأ في جلب البيانات");
             return;
           }
 
           document.getElementById("studentName").innerText = data.name || "---";
           document.getElementById("examId").innerText = data.examId || examId;
 
-          if (data.note && data.note.includes("تم حجب النتيجة")) {
+          if (data.subjects.length === 0) {
             document.getElementById("subjectsTableWrapper").style.display = "none";
-            document.getElementById("noteText").innerText = data.note;
+            document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
           } else {
             const tableBody = document.getElementById("subjectsTable");
             tableBody.innerHTML = "";
-            (data.subjects || []).forEach(sub => {
+            data.subjects.forEach(sub => {
               const row = document.createElement("tr");
               row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
               tableBody.appendChild(row);
