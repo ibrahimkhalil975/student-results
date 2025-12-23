@@ -4,92 +4,19 @@
   <meta charset="UTF-8">
   <title>جامعة الهادي - نتائج الطلاب</title>
   <style>
-    body {
-      font-family: "Cairo", "Tahoma", sans-serif;
-      background-color: #f0f2f5;
-      direction: rtl;
-      margin: 0;
-      padding: 0;
-    }
-    .header {
-      background-color: #002147;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 26px;
-      font-weight: bold;
-    }
-    .sub-header {
-      background-color: #004080;
-      color: white;
-      padding: 12px;
-      text-align: center;
-      font-size: 18px;
-    }
-    .input-section {
-      text-align: center;
-      margin: 30px 0;
-    }
-    input {
-      padding: 10px;
-      width: 250px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #004080;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 10px;
-    }
-    .card {
-      background-color: white;
-      margin: 0 auto 30px;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 700px;
-      text-align: right;
-    }
-    .student-info {
-      font-size: 18px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #004080;
-      color: white;
-    }
-    .note {
-      color: red;
-      font-size: 18px;
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    .signature {
-      font-size: 16px;
-      color: #555;
-      text-align: left;
-      padding-left: 20px;
-    }
+    body {font-family:"Cairo","Tahoma",sans-serif;background:#f0f2f5;direction:rtl;margin:0;padding:0;}
+    .header {background:#002147;color:#fff;padding:20px;text-align:center;font-size:26px;font-weight:bold;}
+    .sub-header {background:#004080;color:#fff;padding:12px;text-align:center;font-size:18px;}
+    .input-section {text-align:center;margin:30px 0;}
+    input {padding:10px;width:250px;font-size:16px;border:1px solid #ccc;border-radius:5px;}
+    button {padding:10px 20px;font-size:16px;background:#004080;color:#fff;border:none;border-radius:5px;cursor:pointer;margin-right:10px;}
+    .card {background:#fff;margin:0 auto 30px;padding:25px;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,0.1);width:90%;max-width:700px;text-align:right;}
+    .student-info {font-size:18px;margin-bottom:20px;border-bottom:2px solid #eee;padding-bottom:10px;}
+    table {width:100%;border-collapse:collapse;margin-bottom:20px;}
+    th,td {border:1px solid #ccc;padding:10px;text-align:center;}
+    th {background:#004080;color:#fff;}
+    .note {color:red;font-size:18px;text-align:center;font-weight:bold;margin-bottom:20px;}
+    .signature {font-size:16px;color:#555;text-align:left;padding-left:20px;}
   </style>
 </head>
 <body>
@@ -109,10 +36,7 @@
 
     <table>
       <thead>
-        <tr>
-          <th>المادة</th>
-          <th>الدرجة</th>
-        </tr>
+        <tr><th>المادة</th><th>الدرجة</th></tr>
       </thead>
       <tbody id="subjectsTable"></tbody>
     </table>
@@ -126,7 +50,7 @@
       var examId = document.getElementById("examInput").value.trim();
       if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
 
-      fetch("https://script.google.com/macros/s/AKfycby28UxK5xPungnaPvO1aDePtnvblGOtpN6SNSbEC-ZlXhwpWy4vHExwUkJ4ScNTE5mw7Q/exec?id=" + examId)
+      fetch("https://script.google.com/macros/s/AKfycbzyjfOyCm559AWqaW8k2IYF3zxSOKCh1cCssQ7oi4y-jKVON_g6CogQNFuBKRjLOVqZJg/exec?id=" + examId)
         .then(res => res.json())
         .then(data => {
           document.getElementById("studentName").innerText = data.name;
@@ -141,7 +65,6 @@
           });
 
           document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
-
           document.getElementById("resultCard").style.display = "block";
         })
         .catch(err => {
