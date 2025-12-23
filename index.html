@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>نتائج الطلاب - جامعة بغداد / كلية العلوم</title>
+  <title>جامعة الهادي - نتائج الطلاب</title>
   <style>
     body {
       font-family: "Tahoma", sans-serif;
@@ -16,6 +16,12 @@
       padding: 20px;
       font-size: 22px;
       font-weight: bold;
+    }
+    .sub-header {
+      background: #007bff;
+      color: #fff;
+      padding: 10px;
+      font-size: 18px;
     }
     .card {
       background: #fff;
@@ -53,13 +59,40 @@
       font-weight: bold;
       color: #004080;
       text-align: center;
+      margin-bottom: 20px;
+    }
+    .signature {
+      font-size: 16px;
+      color: #555;
+      text-align: left;
+      padding-left: 20px;
+    }
+    input {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="header">جامعة بغداد - كلية العلوم</div>
+  <div class="header">جامعة الهادي</div>
+  <div class="sub-header">الكلية التقنية الهندسية - قسم الأجهزة الطبية</div>
 
-  <div class="card">
+  <input type="text" id="examInput" placeholder="أدخل رقمك الامتحاني">
+  <button onclick="loadResult()">عرض النتيجة</button>
+
+  <div class="card" id="resultCard" style="display:none;">
     <div class="student-info">
       <p>الاسم: <span id="studentName">---</span></p>
       <p>الرقم الامتحاني: <span id="examId">---</span></p>
@@ -72,46 +105,40 @@
           <th>الدرجة</th>
         </tr>
       </thead>
-      <tbody id="subjectsTable">
-        <!-- هنا تنعرض المواد والدرجات -->
-      </tbody>
+      <tbody id="subjectsTable"></tbody>
     </table>
 
     <div class="final">الدرجة النهائية: <span id="finalGrade">---</span></div>
+    <div class="signature">المهندس إبراهيم خليل</div>
   </div>
 
   <script>
-    // مثال بيانات تجريبية (تجي من السكربت لاحقاً)
-    var studentData = {
-      name: "ابراهيم محمود سيد لطيفة",
-      examId: "1146",
-      subjects: [
-        { name: "المعالج الدقيق", grade: 75 },
-        { name: "الإشارات والأنظمة", grade: 68 },
-        { name: "المجالات الكهرو مغناطيسية", grade: 70 },
-        { name: "برمجة الحاسوب وتطبيقاته (C++)", grade: 80 },
-        { name: "أجهزة التشخيص الطبي 1", grade: 72 },
-        { name: "إدارة المشاريع", grade: 85 }
-      ]
-    };
+    function loadResult() {
+      var examId = document.getElementById("examInput").value.trim();
+      if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
 
-    // عرض البيانات
-    document.getElementById("studentName").innerText = studentData.name;
-    document.getElementById("examId").innerText = studentData.examId;
+      fetch("https://script.google.com/macros/s/AKfycbxYhW9cHpBWzamHnP80wMXbk-Cc-Y7jIef80xKt_dZN1tTEDsdUbXuXJa0e9v6kNBg0aA/exec?id=" + examId)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("studentName").innerText = data.name;
+          document.getElementById("examId").innerText = data.examId;
+          document.getElementById("finalGrade").innerText = data.final;
 
-    var tableBody = document.getElementById("subjectsTable");
-    var total = 0;
+          var table = document.getElementById("subjectsTable");
+          table.innerHTML = "";
+          data.subjects.forEach(sub => {
+            var row = document.createElement("tr");
+            row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
+            table.appendChild(row);
+          });
 
-    studentData.subjects.forEach(sub => {
-      var row = document.createElement("tr");
-      row.innerHTML = "<td>" + sub.name + "</td><td>" + sub.grade + "</td>";
-      tableBody.appendChild(row);
-      total += sub.grade;
-    });
-
-    // حساب المعدل (مجموع ÷ عدد المواد)
-    var avg = (total / studentData.subjects.length).toFixed(2);
-    document.getElementById("finalGrade").innerText = avg;
+          document.getElementById("resultCard").style.display = "block";
+        })
+        .catch(err => {
+          alert("الرقم غير موجود أو حدث خطأ");
+          console.error(err);
+        });
+    }
   </script>
 </body>
 </html>
