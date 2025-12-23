@@ -124,4 +124,31 @@
   <script>
     function loadResult() {
       var examId = document.getElementById("examInput").value.trim();
-      if (!examId) return alert
+      if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
+
+      fetch("https://script.google.com/macros/s/AKfycby28UxK5xPungnaPvO1aDePtnvblGOtpN6SNSbEC-ZlXhwpWy4vHExwUkJ4ScNTE5mw7Q/exec?id=" + examId)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("studentName").innerText = data.name;
+          document.getElementById("examId").innerText = data.examId;
+
+          var table = document.getElementById("subjectsTable");
+          table.innerHTML = "";
+          data.subjects.forEach(sub => {
+            var row = document.createElement("tr");
+            row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
+            table.appendChild(row);
+          });
+
+          document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
+
+          document.getElementById("resultCard").style.display = "block";
+        })
+        .catch(err => {
+          alert("الرقم غير موجود أو حدث خطأ");
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>
