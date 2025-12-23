@@ -46,24 +46,49 @@
   </div>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5bDn1_XWMhmz6qUM2BVsT5hf7Bwx-aUk-0kpjE0aYaY4fmEceeR7zRncEdql5l55A2w/exec";
+
     function loadResult() {
-      var examId = document.getElementById("examInput").value.trim();
+      const examId = document.getElementById("examInput").value.trim();
       if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
 
-      fetch("https://script.google.com/macros/s/AKfycbyDgUFnx0S_JZbgv4yBWwbsxJdvK2BhjjgA9xvsOGeiFB20FFqmSab0CwG3tNaQ3pu0ZQ/exec?id=" + examId)
+      fetch(`${SCRIPT_URL}?id=${encodeURIComponent(examId)}`)
         .then(res => res.json())
         .then(data => {
-          document.getElementById("studentName").innerText = data.name;
-          document.getElementById("examId").innerText = data.examId;
+          if (data.error) {
+            if (data.error === "not_found") {
+              alert("الرقم غير موجود");
+            } else {
+              alert("حدث خطأ في جلب البيانات");
+            }
+            return;
+          }
 
-          // إذا النتيجة محجوبة
-          if (data.note && data.note.includes("حجب")) {
+          document.getElementById("studentName").innerText = data.name || "---";
+          document.getElementById("examId").innerText = data.examId || examId;
+
+          if (data.note && data.note.includes("تم حجب النتيجة")) {
             document.getElementById("subjectsTableWrapper").style.display = "none";
-            document.getElementById("noteText").innerText = "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
+            document.getElementById("noteText").innerText = data.note;
           } else {
-            var table = document.getElementById("subjectsTable");
-            table.innerHTML = "";
-            data.subjects.forEach(sub => {
-              var row = document.createElement("tr");
+            const tableBody = document.getElementById("subjectsTable");
+            tableBody.innerHTML = "";
+            (data.subjects || []).forEach(sub => {
+              const row = document.createElement("tr");
               row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
-              table.appendChild
+              tableBody.appendChild(row);
+            });
+            document.getElementById("subjectsTableWrapper").style.display = "table";
+            document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
+          }
+
+          document.getElementById("resultCard").style.display = "block";
+        })
+        .catch(err => {
+          console.error(err);
+          alert("تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات.");
+        });
+    }
+  </script>
+</body>
+</html>
