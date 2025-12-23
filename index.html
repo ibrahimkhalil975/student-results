@@ -2,39 +2,76 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>نظام نتائج الطلبة</title>
+  <title>نظام نتائج الطلاب</title>
   <style>
     body {
-      font-family: 'Tahoma';
-      background-color: #f0f0f0;
+      font-family: "Tahoma", sans-serif;
+      background-color: #f4f4f4;
       text-align: center;
-      padding-top: 50px;
+      direction: rtl;
     }
-    input, button {
+    .container {
+      margin-top: 100px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      display: inline-block;
+    }
+    input {
       padding: 10px;
+      width: 250px;
       font-size: 16px;
-      margin: 5px;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
     }
     #result {
       margin-top: 20px;
       font-size: 18px;
-      color: #003366;
-      white-space: pre-line;
+      color: #333;
+      white-space: pre-line; /* يخلي النص يظهر بسطر جديد */
     }
   </style>
 </head>
 <body>
-  <h2>أدخل رقمك الامتحاني لعرض نتيجتك</h2>
-  <input type="text" id="examId" placeholder="رقم الامتحان">
-  <button onclick="getResult()">عرض النتيجة</button>
-  <div id="result"></div>
+  <div class="container">
+    <h2>أدخل رقمك الامتحاني لعرض نتيجتك</h2>
+    <input type="text" id="examId" placeholder="اكتب رقمك هنا">
+    <br>
+    <button onclick="getResult()">عرض النتيجة</button>
+    <div id="result"></div>
+  </div>
 
   <script>
     function getResult() {
-      var id = document.getElementById("examId").value;
-      fetch("https://script.google.com/macros/s/AKfycbyzlGHrRLqlabRQGxFagKkBiuS8A9feTA1SC1JTFa7H_TLuexeyjfeZ9Kap0GDzUwQQg/exec?id=" + id)
+      var examId = document.getElementById("examId").value;
+      var resultDiv = document.getElementById("result");
+
+      if (examId.trim() === "") {
+        resultDiv.innerText = "الرجاء إدخال الرقم الامتحاني";
+        return;
+      }
+
+      fetch("https://script.google.com/macros/s/AKfycbzz-XsTdF2UJt1oWf094G-ApEFgrBBqA9QUbJTo3ytvGNWWfbf4rq0O9qui0KchgJIqqQ/exec?id=" + examId)
         .then(response => response.text())
-        .then(data => document.getElementById("result").innerText = data);
+        .then(data => {
+          resultDiv.innerText = data;
+        })
+        .catch(error => {
+          resultDiv.innerText = "حدث خطأ أثناء جلب النتيجة";
+          console.error(error);
+        });
     }
   </script>
 </body>
