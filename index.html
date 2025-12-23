@@ -2,77 +2,116 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>نظام نتائج الطلاب</title>
+  <title>نتائج الطلاب - جامعة بغداد / كلية العلوم</title>
   <style>
     body {
       font-family: "Tahoma", sans-serif;
       background-color: #f4f4f4;
-      text-align: center;
       direction: rtl;
+      text-align: center;
     }
-    .container {
-      margin-top: 100px;
+    .header {
+      background: #004080;
+      color: #fff;
+      padding: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .card {
       background: #fff;
-      padding: 30px;
+      margin: 30px auto;
+      padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px #ccc;
-      display: inline-block;
+      width: 80%;
+      max-width: 700px;
+      text-align: right;
     }
-    input {
-      padding: 10px;
-      width: 250px;
-      font-size: 16px;
-      margin-bottom: 15px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    #result {
-      margin-top: 20px;
+    .student-info {
+      margin-bottom: 20px;
       font-size: 18px;
-      color: #333;
-      white-space: pre-line; /* يخلي النص يظهر بسطر جديد */
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th {
+      background: #004080;
+      color: #fff;
+      padding: 10px;
+    }
+    td {
+      padding: 10px;
+      text-align: center;
+    }
+    .final {
+      font-size: 20px;
+      font-weight: bold;
+      color: #004080;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>أدخل رقمك الامتحاني لعرض نتيجتك</h2>
-    <input type="text" id="examId" placeholder="اكتب رقمك هنا">
-    <br>
-    <button onclick="getResult()">عرض النتيجة</button>
-    <div id="result"></div>
+  <div class="header">جامعة بغداد - كلية العلوم</div>
+
+  <div class="card">
+    <div class="student-info">
+      <p>الاسم: <span id="studentName">---</span></p>
+      <p>الرقم الامتحاني: <span id="examId">---</span></p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>المادة</th>
+          <th>الدرجة</th>
+        </tr>
+      </thead>
+      <tbody id="subjectsTable">
+        <!-- هنا تنعرض المواد والدرجات -->
+      </tbody>
+    </table>
+
+    <div class="final">الدرجة النهائية: <span id="finalGrade">---</span></div>
   </div>
 
   <script>
-    function getResult() {
-      var examId = document.getElementById("examId").value;
-      var resultDiv = document.getElementById("result");
+    // مثال بيانات تجريبية (تجي من السكربت لاحقاً)
+    var studentData = {
+      name: "ابراهيم محمود سيد لطيفة",
+      examId: "1146",
+      subjects: [
+        { name: "المعالج الدقيق", grade: 75 },
+        { name: "الإشارات والأنظمة", grade: 68 },
+        { name: "المجالات الكهرو مغناطيسية", grade: 70 },
+        { name: "برمجة الحاسوب وتطبيقاته (C++)", grade: 80 },
+        { name: "أجهزة التشخيص الطبي 1", grade: 72 },
+        { name: "إدارة المشاريع", grade: 85 }
+      ]
+    };
 
-      if (examId.trim() === "") {
-        resultDiv.innerText = "الرجاء إدخال الرقم الامتحاني";
-        return;
-      }
+    // عرض البيانات
+    document.getElementById("studentName").innerText = studentData.name;
+    document.getElementById("examId").innerText = studentData.examId;
 
-      fetch("https://script.google.com/macros/s/AKfycbzz-XsTdF2UJt1oWf094G-ApEFgrBBqA9QUbJTo3ytvGNWWfbf4rq0O9qui0KchgJIqqQ/exec?id=" + examId)
-        .then(response => response.text())
-        .then(data => {
-          resultDiv.innerText = data;
-        })
-        .catch(error => {
-          resultDiv.innerText = "حدث خطأ أثناء جلب النتيجة";
-          console.error(error);
-        });
-    }
+    var tableBody = document.getElementById("subjectsTable");
+    var total = 0;
+
+    studentData.subjects.forEach(sub => {
+      var row = document.createElement("tr");
+      row.innerHTML = "<td>" + sub.name + "</td><td>" + sub.grade + "</td>";
+      tableBody.appendChild(row);
+      total += sub.grade;
+    });
+
+    // حساب المعدل (مجموع ÷ عدد المواد)
+    var avg = (total / studentData.subjects.length).toFixed(2);
+    document.getElementById("finalGrade").innerText = avg;
   </script>
 </body>
 </html>
