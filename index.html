@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>نظام نتائج الطلبة</title>
+  <style>
+    body {
+      font-family: 'Tahoma';
+      background-color: #f0f0f0;
+      text-align: center;
+      padding-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #003366;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <h2>أدخل رقمك الامتحاني لعرض نتيجتك</h2>
+  <input type="text" id="examId" placeholder="رقم الامتحان">
+  <button onclick="getResult()">عرض النتيجة</button>
+  <div id="result"></div>
+
+  <script>
+    function getResult() {
+      var id = document.getElementById("examId").value;
+      fetch("https://script.google.com/macros/s/AKfycbyzlGHrRLqlabRQGxFagKkBiuS8A9feTA1SC1JTFa7H_TLuexeyjfeZ9Kap0GDzUwQQg/exec?id=" + id)
+        .then(response => response.text())
+        .then(data => document.getElementById("result").innerText = data);
+    }
+  </script>
+</body>
+</html>
