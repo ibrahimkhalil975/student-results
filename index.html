@@ -66,7 +66,7 @@
               stage_not_found: "الرقم لا ينتمي لأي مرحلة",
               sheet_not_found: "لم يتم العثور على ورقة المرحلة المحددة",
               empty_sheet: "الورقة فارغة أو غير جاهزة",
-              headers_missing: "عناوين الأعمدة غير مطابقة (تحقق من: رقم الامتحان، الاسم، ملاحظة، حالة النتيجة)",
+              headers_missing: "عناوين الأعمدة غير مطابقة (تحقق من: الرقم الامتحاني، الاسم، ملاحظة/ملاحظات، حالة النتيجة)",
               not_found: "الرقم غير موجود"
             };
             alert(map[data.error] || "تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات.");
@@ -88,4 +88,30 @@
             document.getElementById("subjectsTableWrapper").style.display = "none";
             document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
           } else {
-            const tableBody = document.getElement
+            const tableBody = document.getElementById("subjectsTable");
+            tableBody.innerHTML = "";
+            data.subjects.forEach(sub => {
+              const row = document.createElement("tr");
+              row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
+              tableBody.appendChild(row);
+            });
+            document.getElementById("subjectsTableWrapper").style.display = "table";
+            document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
+          }
+
+          document.getElementById("resultCard").style.display = "block";
+        })
+        .catch(() => alert("تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات."));
+    }
+
+    function printResult() {
+      const printContents = document.getElementById("resultCard").innerHTML;
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
+    }
+  </script>
+</body>
+</html>
