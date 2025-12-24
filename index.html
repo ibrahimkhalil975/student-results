@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>نتائج الطلاب - جامعة الهادي</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {font-family:"Cairo","Tahoma",sans-serif;direction:rtl;background:#f9f9f9;margin:0;padding:0;}
     header {background:#004080;color:#fff;text-align:center;padding:20px;}
@@ -55,10 +56,9 @@
   </main>
 
   <footer>
-   م. إبراهيم خليل كامل
+    مع تحيات م. إبراهيم خليل كامل
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxb8Ok7B_PMbdACBmfrsDzcS9zg64DnnLXtbG4OQcq9zwvQyfyWFfUGsTQoICb6gOe9bg/exec";
 
@@ -115,36 +115,16 @@
       location.reload();
     }
 
-    async function savePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({orientation: "portrait", unit: "mm", format: "a4"});
-      doc.setFont("Helvetica","normal");
-      doc.setFontSize(14);
-
-      doc.text("جامعة الهادي - الكلية التقنية الهندسية - قسم تقنيات الأجهزة الطبية", 10, 20);
-      doc.text("الاسم: " + document.getElementById("studentName").innerText, 10, 35);
-      doc.text("الرقم الامتحاني: " + document.getElementById("examId").innerText, 10, 45);
-
-      let y = 60;
-      doc.setFontSize(12);
-      doc.text("المواد والدرجات:", 10, y);
-      y += 10;
-
-      const rows = document.querySelectorAll("#subjectsTable tr");
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        if (cols.length === 2 && cols[1].innerText.trim() !== "") {
-          doc.text(`${cols[0].innerText} : ${cols[1].innerText}`, 10, y);
-          y += 8;
-        }
-      });
-
-      y += 10;
-      doc.text("ملاحظة: " + document.getElementById("noteText").innerText, 10, y);
-      y += 20;
-      doc.text("مع تحيات م. إبراهيم خليل كامل", 10, y);
-
-      doc.save("نتيجة_" + document.getElementById("examId").innerText + ".pdf");
+    function savePDF() {
+      const element = document.getElementById("resultCard");
+      const opt = {
+        margin: 0.5,
+        filename: "نتيجة_" + document.getElementById("examId").innerText + ".pdf",
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
     }
   </script>
 </body>
