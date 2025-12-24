@@ -7,9 +7,7 @@
   <style>
     body {font-family:"Cairo","Tahoma",sans-serif;direction:rtl;background:#f9f9f9;margin:0;padding:0;}
     header {background:#004080;color:#fff;text-align:center;padding:20px;}
-    header h1 {margin:5px 0;font-size:24px;}
-    header h2 {margin:5px 0;font-size:20px;}
-    header h3 {margin:5px 0;font-size:18px;}
+    header h1,h2,h3 {margin:5px 0;}
     main {padding:20px;max-width:800px;margin:auto;}
     input, button {padding:10px;font-size:16px;margin:5px;width:100%;box-sizing:border-box;}
     .card {background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);margin-top:20px;}
@@ -21,6 +19,7 @@
     footer {text-align:center;padding:15px;background:#eee;margin-top:20px;font-weight:bold;}
     .btn {padding:10px;border:none;border-radius:5px;cursor:pointer;font-size:16px;background:#007bff;color:#fff;}
     .btn:disabled {background:#999;cursor:not-allowed;}
+    .logout {background:#dc3545;color:#fff;margin-top:10px;}
   </style>
 </head>
 <body>
@@ -50,6 +49,9 @@
       <p id="warningMsg" class="warning" style="display:none;">
         ⚠️ لا يمكنك مشاهدة نتائج الآخرين، فقط نتيجتك
       </p>
+
+      <!-- زر تسجيل خروج -->
+      <button class="btn logout" onclick="logout()">تسجيل خروج</button>
     </div>
   </main>
 
@@ -58,7 +60,8 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxb8Ok7B_PMbdACBmfrsDzcS9zg64DnnLXtbG4OQcq9zwvQyfyWFfUGsTQoICb6gOe9bg/exec";
+    const SCRIPT_URL = "رابط السكربت الخاص بك";
+    const RESET_CODE = "qbi20"; // الرمز الخاص بك
 
     // عند تحميل الصفحة، تحقق إذا كان الرقم مخزن مسبقاً
     window.onload = function() {
@@ -76,11 +79,6 @@
       fetch(`${SCRIPT_URL}?id=${encodeURIComponent(examId)}`)
         .then(res => res.json())
         .then(data => {
-          if (data.error) {
-            alert("تعذر جلب البيانات.");
-            return;
-          }
-
           document.getElementById("studentName").innerText = data.name || "---";
           document.getElementById("examId").innerText = data.examId || examId;
 
@@ -115,6 +113,17 @@
           }
         })
         .catch(() => alert("تعذر جلب البيانات"));
+    }
+
+    function logout() {
+      const code = prompt("أدخل رمز إعادة التعيين:");
+      if (code === RESET_CODE) {
+        localStorage.removeItem("examId");
+        alert("تم تسجيل الخروج وإعادة فتح النظام.");
+        location.reload();
+      } else {
+        alert("⚠️ الرمز غير صحيح، لا يمكنك إعادة التعيين.");
+      }
     }
   </script>
 </body>
