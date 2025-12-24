@@ -91,9 +91,11 @@
             document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
           } else {
             data.subjects.forEach(sub => {
-              const row = document.createElement("tr");
-              row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
-              tableBody.appendChild(row);
+              if (sub.grade !== "" && sub.grade !== null) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
+                tableBody.appendChild(row);
+              }
             });
             document.getElementById("subjectsTableWrapper").style.display = "table";
             document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
@@ -130,7 +132,7 @@
       });
 
       doc.text("ملاحظة: " + document.getElementById("noteText").innerText, 10, y+10);
-      doc.text(" م. إبراهيم خليل كامل", 10, y+30);
+      doc.text("مع تحيات م. إبراهيم خليل كامل", 10, y+30);
 
       doc.save("result.pdf");
     }
