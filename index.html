@@ -11,6 +11,7 @@
     th, td {border:1px solid #ccc;padding:8px;text-align:center;}
     th {background:#004080;color:#fff;}
     .note {color:red;font-weight:bold;margin-top:10px;}
+    .print-btn {background:#28a745;color:#fff;padding:8px 15px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;}
   </style>
 </head>
 <body>
@@ -28,10 +29,11 @@
     </table>
 
     <p class="note">📌 ملاحظة: <span id="noteText">---</span></p>
+    <button class="print-btn" onclick="printResult()">🖨️ طباعة النتيجة</button>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwna7gQznJwrcXBAfbCDjuGRfZW0yvqcLFTfFspXzBq6KWaPHnyO5haFxQ8trOlJ4w8/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbymzFfjoWi-QuJcW2szRU7ShewRdOcSrD7lzuu5sne7nky13m05AUr_MOM2wi0Q7ojM2g/exec";
 
     function loadResult() {
       const examId = document.getElementById("examInput").value.trim();
@@ -73,6 +75,15 @@
           document.getElementById("resultCard").style.display = "block";
         })
         .catch(() => alert("تعذر جلب البيانات"));
+    }
+
+    function printResult() {
+      const printContents = document.getElementById("resultCard").innerHTML;
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
     }
   </script>
 </body>
