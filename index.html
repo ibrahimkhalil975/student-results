@@ -1,61 +1,83 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <title>نتائج الطلاب</title>
-</head>
-<body>
-  <h2>أدخل رقمك الامتحاني لعرض النتيجة</h2>
-  <input type="text" id="examInput" placeholder="رقم الامتحان">
-  <button onclick="loadResult()">عرض النتيجة</button>
+function doGet(e) {
+  var examId = (e && e.parameter && e.parameter.id || "").trim();
+  if (!examId) return jsonOut({ error: "missing_id" });
 
-  <div id="resultCard" style="display:none;">
-    <p>الاسم: <span id="studentName">---</span></p>
-    <p>الرقم الامتحاني: <span id="examId">---</span></p>
-    <table id="subjectsTableWrapper" style="display:none;">
-      <thead><tr><th>المادة</th><th>الدرجة</th></tr></thead>
-      <tbody id="subjectsTable"></tbody>
-    </table>
-    <p>ملاحظة: <span id="noteText">---</span></p>
-  </div>
+  var num = parseInt(examId, 10);
+  var ss = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1RPpj2NcEm_1smbolDgZsabwkqVfSZRD7b0kDczU5-Qs/edit");
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJM3PrZ_vexsXzcZH2Ixhn1TzRbTMoNA7p-ZzvfFyVXPFJDN6zMAUfM5p0KzVH9A3K9A/exec";
+  var SECOND_STAGE_GID = 1222770986;   // ورقة المرحلة الثانية
+  var THIRD_STAGE_GID  = 1378396221;   // ورقة المرحلة الثالثة الجديدة
 
-    function loadResult() {
-      const examId = document.getElementById("examInput").value.trim();
-      if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
+  var sheet;
+  if (num >= 455 && num <= 598) {
+    sheet = ss.getSheetById(SECOND_STAGE_GID);
+  } else if (num >= 33 && num <= 453) {
+    sheet = ss.getSheetById(THIRD_STAGE_GID);
+  } else {
+    return jsonOut({ error: "stage_not_found" });
+  }
 
-      fetch(`${SCRIPT_URL}?id=${encodeURIComponent(examId)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            alert("خطأ: " + data.error);
-            return;
-          }
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0].map(h => h.toString().trim());
 
-          document.getElementById("studentName").innerText = data.name || "---";
-          document.getElementById("examId").innerText = data.examId || examId;
-
-          if (!data.subjects || data.subjects.length === 0) {
-            document.getElementById("subjectsTableWrapper").style.display = "none";
-            document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة";
-          } else {
-            const tableBody = document.getElementById("subjectsTable");
-            tableBody.innerHTML = "";
-            data.subjects.forEach(sub => {
-              const row = document.createElement("tr");
-              row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
-              tableBody.appendChild(row);
-            });
-            document.getElementById("subjectsTableWrapper").style.display = "table";
-            document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
-          }
-
-          document.getElementById("resultCard").style.display = "block";
-        })
-        .catch(() => alert("تعذر جلب البيانات"));
+  function findHeader(possibleNames) {
+    for (var i = 0; i < possibleNames.length; i++) {
+      var idx = headers.indexOf(possibleNames[i]);
+      if (idx !== -1) return idx;
     }
-  </script>
-</body>
-</html>
+    return -1;
+  }
+
+  var idxExam   = findHeader(["رقم الامتحان","الرقم الامتحاني"]);
+  var idxName   = findHeader(["الاسم","اسم الطالب"]);
+  var idxNote   = findHeader(["ملاحظة","ملاحظات"]);
+  var idxStatus = findHeader(["حالة النتيجة"]);
+
+  if (idxExam === -1 || idxName === -1 || idxNote === -1 || idxStatus === -1) {
+    return jsonOut({ error: "headers_missing" });
+  }
+
+  var subjectIndices = [];
+  for (var c = 0; c < headers.length; c++) {
+    if (![idxExam, idxName, idxNote, idxStatus].includes(c)) {
+      subjectIndices.push(c);
+    }
+  }
+
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if ((row[idxExam] || "").toString().trim() === examId) {
+      var status = row[idxStatus];
+      var note = (row[idxNote] || "").toString().trim();
+      var name = (row[idxName] || "").toString().trim();
+
+      if (String(status) === "0") {
+        return jsonOut({
+          name: name,
+          examId: examId,
+          subjects: [],
+          note: "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم"
+        });
+      }
+
+      var subjects = subjectIndices.map(col => ({
+        name: headers[col],
+        grade: row[col]
+      }));
+
+      return jsonOut({
+        name: name,
+        examId: examId,
+        subjects: subjects,
+        note: note || ""
+      });
+    }
+  }
+
+  return jsonOut({ error: "not_found" });
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
