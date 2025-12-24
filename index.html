@@ -17,6 +17,7 @@
     th {background:#004080;color:#fff;}
     .note {color:red;font-size:18px;text-align:center;font-weight:bold;margin-bottom:20px;}
     .signature {font-size:16px;color:#555;text-align:left;padding-left:20px;}
+    .print-btn {background:#28a745;color:#fff;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;}
   </style>
 </head>
 <body>
@@ -32,6 +33,7 @@
     <div class="student-info">
       <p>الاسم: <span id="studentName">---</span></p>
       <p>الرقم الامتحاني: <span id="examId">---</span></p>
+      <p>المرحلة: <span id="studentStage">---</span></p>
     </div>
 
     <table id="subjectsTableWrapper" style="display:none;">
@@ -43,10 +45,12 @@
 
     <div class="note">ملاحظة: <span id="noteText">---</span></div>
     <div class="signature">المهندس إبراهيم خليل</div>
+    <div style="text-align:center;margin-top:20px;">
+      <button class="print-btn" onclick="printResult()">🖨️ طباعة النتيجة</button>
+    </div>
   </div>
 
   <script>
-    // رابط تطبيق الويب الجديد
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqJIRzb3k9btXmVnaR5YntMixsuX69HAms74UaeqzaXpGrqaaJyyxu7QgaxIuTJJ8e6g/exec";
 
     function loadResult() {
@@ -72,6 +76,13 @@
           document.getElementById("studentName").innerText = data.name || "---";
           document.getElementById("examId").innerText = data.examId || examId;
 
+          // تحديد المرحلة حسب الرقم
+          const num = parseInt(examId, 10);
+          let stage = "---";
+          if (num >= 455 && num <= 598) stage = "المرحلة الثانية";
+          else if (num >= 33 && num <= 453) stage = "المرحلة الثالثة";
+          document.getElementById("studentStage").innerText = stage;
+
           if (!data.subjects || data.subjects.length === 0) {
             document.getElementById("subjectsTableWrapper").style.display = "none";
             document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
@@ -90,6 +101,15 @@
           document.getElementById("resultCard").style.display = "block";
         })
         .catch(() => alert("تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات."));
+    }
+
+    function printResult() {
+      const printContents = document.getElementById("resultCard").innerHTML;
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
     }
   </script>
 </body>
