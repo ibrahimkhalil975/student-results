@@ -60,7 +60,16 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxb8Ok7B_PMbdACBmfrsDzcS9zg64DnnLXtbG4OQcq9zwvQyfyWFfUGsTQoICb6gOe9bg/exec";
 
-    function loadResult() {
+    // عند تحميل الصفحة، تحقق إذا كان الرقم مخزن مسبقاً
+    window.onload = function() {
+      const savedExamId = localStorage.getItem("examId");
+      if (savedExamId) {
+        document.getElementById("examInput").value = savedExamId;
+        loadResult(true); // عرض النتيجة مباشرة مع رسالة التحذير
+      }
+    };
+
+    function loadResult(fromStorage = false) {
       const examId = document.getElementById("examInput").value.trim();
       if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
 
@@ -68,14 +77,7 @@
         .then(res => res.json())
         .then(data => {
           if (data.error) {
-            const map = {
-              missing_id: "يرجى إدخال الرقم الامتحاني",
-              stage_not_found: "الرقم لا ينتمي لأي مرحلة",
-              sheet_not_found: "لم يتم العثور على ورقة المرحلة المحددة",
-              headers_missing: "عناوين الأعمدة غير مطابقة",
-              not_found: "الرقم غير موجود"
-            };
-            alert(map[data.error] || "تعذر جلب البيانات.");
+            alert("تعذر جلب البيانات.");
             return;
           }
 
@@ -106,6 +108,11 @@
           document.getElementById("searchBtn").disabled = true;
           document.getElementById("searchBtn").innerText = "تم عرض نتيجتك";
           document.getElementById("warningMsg").style.display = "block";
+
+          // خزن الرقم الامتحاني في LocalStorage
+          if (!fromStorage) {
+            localStorage.setItem("examId", examId);
+          }
         })
         .catch(() => alert("تعذر جلب البيانات"));
     }
