@@ -74,10 +74,10 @@
               missing_id: "يرجى إدخال الرقم الامتحاني",
               stage_not_found: "الرقم لا ينتمي لأي مرحلة",
               sheet_not_found: "لم يتم العثور على ورقة المرحلة المحددة",
-              headers_missing: "عناوين الأعمدة غير مطابقة (تحقق من: الرقم الامتحاني، الاسم، ملاحظة/ملاحظات، حالة النتيجة)",
+              headers_missing: "عناوين الأعمدة غير مطابقة",
               not_found: "الرقم غير موجود"
             };
-            alert(map[data.error] || "تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات.");
+            alert(map[data.error] || "تعذر جلب البيانات.");
             return;
           }
 
@@ -117,24 +117,34 @@
 
     async function savePDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF({orientation: "portrait", unit: "mm", format: "a4"});
       doc.setFont("Helvetica","normal");
-      doc.text("جامعة الهادي - الكلية التقنية الهندسية - قسم تقنيات الأجهزة الطبية", 10, 20);
-      doc.text("الاسم: " + document.getElementById("studentName").innerText, 10, 40);
-      doc.text("الرقم الامتحاني: " + document.getElementById("examId").innerText, 10, 50);
+      doc.setFontSize(14);
 
-      let y = 70;
+      doc.text("جامعة الهادي - الكلية التقنية الهندسية - قسم تقنيات الأجهزة الطبية", 10, 20);
+      doc.text("الاسم: " + document.getElementById("studentName").innerText, 10, 35);
+      doc.text("الرقم الامتحاني: " + document.getElementById("examId").innerText, 10, 45);
+
+      let y = 60;
+      doc.setFontSize(12);
+      doc.text("المواد والدرجات:", 10, y);
+      y += 10;
+
       const rows = document.querySelectorAll("#subjectsTable tr");
       rows.forEach(row => {
         const cols = row.querySelectorAll("td");
-        doc.text(cols[0].innerText + " : " + cols[1].innerText, 10, y);
-        y += 10;
+        if (cols.length === 2 && cols[1].innerText.trim() !== "") {
+          doc.text(`${cols[0].innerText} : ${cols[1].innerText}`, 10, y);
+          y += 8;
+        }
       });
 
-      doc.text("ملاحظة: " + document.getElementById("noteText").innerText, 10, y+10);
-      doc.text("مع تحيات م. إبراهيم خليل كامل", 10, y+30);
+      y += 10;
+      doc.text("ملاحظة: " + document.getElementById("noteText").innerText, 10, y);
+      y += 20;
+      doc.text("مع تحيات م. إبراهيم خليل كامل", 10, y);
 
-      doc.save("result.pdf");
+      doc.save("نتيجة_" + document.getElementById("examId").innerText + ".pdf");
     }
   </script>
 </body>
