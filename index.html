@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>نتائج الطلاب - جامعة الهادي</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {font-family:"Cairo","Tahoma",sans-serif;direction:rtl;background:#f9f9f9;margin:0;padding:0;}
     header {background:#004080;color:#fff;text-align:center;padding:20px;}
@@ -21,7 +20,6 @@
     .btn-group {display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
     .btn {flex:1;padding:10px;border:none;border-radius:5px;cursor:pointer;font-size:16px;}
     .btn-print {background:#28a745;color:#fff;}
-    .btn-pdf {background:#007bff;color:#fff;}
     footer {text-align:center;padding:15px;background:#eee;margin-top:20px;font-weight:bold;}
   </style>
 </head>
@@ -35,7 +33,7 @@
   <main>
     <h2>📋 أدخل رقمك الامتحاني لعرض النتيجة</h2>
     <input type="text" id="examInput" placeholder="رقم الامتحان">
-    <button onclick="loadResult()">عرض النتيجة</button>
+    <button id="searchBtn" onclick="loadResult()">عرض النتيجة</button>
 
     <div id="resultCard" class="card" style="display:none;">
       <p>👤 الاسم: <span id="studentName">---</span></p>
@@ -50,7 +48,6 @@
 
       <div class="btn-group">
         <button class="btn btn-print" onclick="printResult()">🖨️ طباعة النتيجة</button>
-        <button class="btn btn-pdf" onclick="savePDF()">💾 حفظ PDF</button>
       </div>
     </div>
   </main>
@@ -102,6 +99,11 @@
           }
 
           document.getElementById("resultCard").style.display = "block";
+
+          // ✅ غلق البحث بعد عرض النتيجة
+          document.getElementById("examInput").disabled = true;
+          document.getElementById("searchBtn").disabled = true;
+          document.getElementById("searchBtn").innerText = "تم عرض نتيجتك";
         })
         .catch(() => alert("تعذر جلب البيانات"));
     }
@@ -113,18 +115,6 @@
       window.print();
       document.body.innerHTML = originalContents;
       location.reload();
-    }
-
-    function savePDF() {
-      const element = document.getElementById("resultCard");
-      const opt = {
-        margin: 0.5,
-        filename: "نتيجة_" + document.getElementById("examId").innerText + ".pdf",
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
     }
   </script>
 </body>
