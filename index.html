@@ -2,36 +2,63 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>نتائج الطلاب</title>
+  <title>نتائج الطلاب - جامعة الهادي</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {font-family:"Cairo","Tahoma",sans-serif;direction:rtl;background:#f0f0f0;padding:20px;}
-    input, button {padding:10px;font-size:16px;margin:5px;}
+    body {font-family:"Cairo","Tahoma",sans-serif;direction:rtl;background:#f9f9f9;margin:0;padding:0;}
+    header {background:#004080;color:#fff;text-align:center;padding:20px;}
+    header h1 {margin:5px 0;font-size:24px;}
+    header h2 {margin:5px 0;font-size:20px;}
+    header h3 {margin:5px 0;font-size:18px;}
+    main {padding:20px;max-width:800px;margin:auto;}
+    input, button {padding:10px;font-size:16px;margin:5px;width:100%;box-sizing:border-box;}
     .card {background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);margin-top:20px;}
     table {width:100%;border-collapse:collapse;margin-top:10px;}
     th, td {border:1px solid #ccc;padding:8px;text-align:center;}
     th {background:#004080;color:#fff;}
     .note {color:red;font-weight:bold;margin-top:10px;}
-    .print-btn {background:#28a745;color:#fff;padding:8px 15px;border:none;border-radius:5px;cursor:pointer;margin-top:10px;}
+    .btn-group {display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+    .btn {flex:1;padding:10px;border:none;border-radius:5px;cursor:pointer;font-size:16px;}
+    .btn-print {background:#28a745;color:#fff;}
+    .btn-pdf {background:#007bff;color:#fff;}
+    footer {text-align:center;padding:15px;background:#eee;margin-top:20px;font-weight:bold;}
   </style>
 </head>
 <body>
-  <h2>📋 أدخل رقمك الامتحاني لعرض النتيجة</h2>
-  <input type="text" id="examInput" placeholder="رقم الامتحان">
-  <button onclick="loadResult()">عرض النتيجة</button>
+  <header>
+    <h1>جامعة الهادي</h1>
+    <h2>الكلية التقنية الهندسية</h2>
+    <h3>قسم تقنيات الأجهزة الطبية</h3>
+  </header>
 
-  <div id="resultCard" class="card" style="display:none;">
-    <p>👤 الاسم: <span id="studentName">---</span></p>
-    <p>🆔 الرقم الامتحاني: <span id="examId">---</span></p>
+  <main>
+    <h2>📋 أدخل رقمك الامتحاني لعرض النتيجة</h2>
+    <input type="text" id="examInput" placeholder="رقم الامتحان">
+    <button onclick="loadResult()">عرض النتيجة</button>
 
-    <table id="subjectsTableWrapper" style="display:none;">
-      <thead><tr><th>المادة</th><th>الدرجة</th></tr></thead>
-      <tbody id="subjectsTable"></tbody>
-    </table>
+    <div id="resultCard" class="card" style="display:none;">
+      <p>👤 الاسم: <span id="studentName">---</span></p>
+      <p>🆔 الرقم الامتحاني: <span id="examId">---</span></p>
 
-    <p class="note">📌 ملاحظة: <span id="noteText">---</span></p>
-    <button class="print-btn" onclick="printResult()">🖨️ طباعة النتيجة</button>
-  </div>
+      <table id="subjectsTableWrapper" style="display:none;">
+        <thead><tr><th>المادة</th><th>الدرجة</th></tr></thead>
+        <tbody id="subjectsTable"></tbody>
+      </table>
 
+      <p class="note">📌 ملاحظة: <span id="noteText">---</span></p>
+
+      <div class="btn-group">
+        <button class="btn btn-print" onclick="printResult()">🖨️ طباعة النتيجة</button>
+        <button class="btn btn-pdf" onclick="savePDF()">💾 حفظ PDF</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    مع تحيات م. إبراهيم خليل كامل
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxb8Ok7B_PMbdACBmfrsDzcS9zg64DnnLXtbG4OQcq9zwvQyfyWFfUGsTQoICb6gOe9bg/exec";
 
@@ -84,6 +111,28 @@
       window.print();
       document.body.innerHTML = originalContents;
       location.reload();
+    }
+
+    async function savePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont("Helvetica","normal");
+      doc.text("جامعة الهادي - الكلية التقنية الهندسية - قسم تقنيات الأجهزة الطبية", 10, 20);
+      doc.text("الاسم: " + document.getElementById("studentName").innerText, 10, 40);
+      doc.text("الرقم الامتحاني: " + document.getElementById("examId").innerText, 10, 50);
+
+      let y = 70;
+      const rows = document.querySelectorAll("#subjectsTable tr");
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        doc.text(cols[0].innerText + " : " + cols[1].innerText, 10, y);
+        y += 10;
+      });
+
+      doc.text("ملاحظة: " + document.getElementById("noteText").innerText, 10, y+10);
+      doc.text(" م. إبراهيم خليل كامل", 10, y+30);
+
+      doc.save("result.pdf");
     }
   </script>
 </body>
