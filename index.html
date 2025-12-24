@@ -45,12 +45,10 @@
 
       <p class="note">📌 ملاحظة: <span id="noteText">---</span></p>
 
-      <!-- رسالة تحذيرية -->
       <p id="warningMsg" class="warning" style="display:none;">
         ⚠️ لا يمكنك مشاهدة نتائج الآخرين، فقط نتيجتك
       </p>
 
-      <!-- زر تسجيل خروج -->
       <button class="btn logout" onclick="logout()">تسجيل خروج</button>
     </div>
   </main>
@@ -60,15 +58,14 @@
   </footer>
 
   <script>
-    const SCRIPT_URL = "رابط السكربت الخاص بك";
-    const RESET_CODE = "qbi20"; // الرمز الخاص بك
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxb8Ok7B_PMbdACBmfrsDzcS9zg64DnnLXtbG4OQcq9zwvQyfyWFfUGsTQoICb6gOe9bg/exec";
+    const RESET_CODE = "qbi20";
 
-    // عند تحميل الصفحة، تحقق إذا كان الرقم مخزن مسبقاً
     window.onload = function() {
       const savedExamId = localStorage.getItem("examId");
       if (savedExamId) {
         document.getElementById("examInput").value = savedExamId;
-        loadResult(true); // عرض النتيجة مباشرة مع رسالة التحذير
+        loadResult(true);
       }
     };
 
@@ -100,14 +97,11 @@
           }
 
           document.getElementById("resultCard").style.display = "block";
-
-          // ✅ غلق النظام بعد عرض النتيجة
           document.getElementById("examInput").disabled = true;
           document.getElementById("searchBtn").disabled = true;
           document.getElementById("searchBtn").innerText = "تم عرض نتيجتك";
           document.getElementById("warningMsg").style.display = "block";
 
-          // خزن الرقم الامتحاني في LocalStorage
           if (!fromStorage) {
             localStorage.setItem("examId", examId);
           }
@@ -116,10 +110,10 @@
     }
 
     function logout() {
-      const code = prompt("أدخل رمز إعادة التعيين:");
+      const code = prompt("أدخل الرمز السري لإعادة فتح النظام:");
       if (code === RESET_CODE) {
         localStorage.removeItem("examId");
-        alert("تم تسجيل الخروج وإعادة فتح النظام.");
+        alert("✅ تم تسجيل الخروج وإعادة فتح النظام.");
         location.reload();
       } else {
         alert("⚠️ الرمز غير صحيح، لا يمكنك إعادة التعيين.");
