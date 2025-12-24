@@ -46,7 +46,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqPsY-Pyx5E3w72hzxZGI20r-ihDEBhWLnt84IqBmIPSTbN4BVOiw9t-owcBef6vd2Dw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTFBKiOTYMvBOYhSsbPFDWHnICE5sbSsgD30JeOYzHgZEmDUNO_AMP15is3KWv0hzr0Q/exec";
 
     function loadResult() {
       const examId = document.getElementById("examInput").value.trim();
@@ -57,6 +57,7 @@
         .then(data => {
           if (data.error) {
             if (data.error === "not_found") alert("الرقم غير موجود");
+            else if (data.error === "stage_not_found") alert("الرقم لا ينتمي لأي مرحلة");
             else alert("حدث خطأ في جلب البيانات");
             return;
           }
