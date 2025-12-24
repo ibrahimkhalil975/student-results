@@ -76,41 +76,16 @@
           document.getElementById("studentName").innerText = data.name || "---";
           document.getElementById("examId").innerText = data.examId || examId;
 
-          // تحديد المرحلة حسب الرقم
-          const num = parseInt(examId, 10);
           let stage = "---";
-          if (num >= 455 && num <= 598) stage = "المرحلة الثانية";
-          else if (num >= 33 && num <= 453) stage = "المرحلة الثالثة";
+          if (!isNaN(parseInt(examId, 10))) {
+            const num = parseInt(examId, 10);
+            if (num >= 455 && num <= 598) stage = "المرحلة الثانية";
+            else if (num >= 33 && num <= 453) stage = "المرحلة الثالثة";
+          }
           document.getElementById("studentStage").innerText = stage;
 
           if (!data.subjects || data.subjects.length === 0) {
             document.getElementById("subjectsTableWrapper").style.display = "none";
             document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
           } else {
-            const tableBody = document.getElementById("subjectsTable");
-            tableBody.innerHTML = "";
-            data.subjects.forEach(sub => {
-              const row = document.createElement("tr");
-              row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
-              tableBody.appendChild(row);
-            });
-            document.getElementById("subjectsTableWrapper").style.display = "table";
-            document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
-          }
-
-          document.getElementById("resultCard").style.display = "block";
-        })
-        .catch(() => alert("تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات."));
-    }
-
-    function printResult() {
-      const printContents = document.getElementById("resultCard").innerHTML;
-      const originalContents = document.body.innerHTML;
-      document.body.innerHTML = printContents;
-      window.print();
-      document.body.innerHTML = originalContents;
-      location.reload();
-    }
-  </script>
-</body>
-</html>
+            const tableBody = document.getElement
