@@ -1,63 +1,61 @@
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJM3PrZ_vexsXzcZH2Ixhn1TzRbTMoNA7p-ZzvfFyVXPFJDN6zMAUfM5p0KzVH9A3K9A/exec";
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>نتائج الطلاب</title>
+</head>
+<body>
+  <h2>أدخل رقمك الامتحاني لعرض النتيجة</h2>
+  <input type="text" id="examInput" placeholder="رقم الامتحان">
+  <button onclick="loadResult()">عرض النتيجة</button>
 
-  function loadResult() {
-    const examId = document.getElementById("examInput").value.trim();
-    if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
+  <div id="resultCard" style="display:none;">
+    <p>الاسم: <span id="studentName">---</span></p>
+    <p>الرقم الامتحاني: <span id="examId">---</span></p>
+    <table id="subjectsTableWrapper" style="display:none;">
+      <thead><tr><th>المادة</th><th>الدرجة</th></tr></thead>
+      <tbody id="subjectsTable"></tbody>
+    </table>
+    <p>ملاحظة: <span id="noteText">---</span></p>
+  </div>
 
-    fetch(`${SCRIPT_URL}?id=${encodeURIComponent(examId)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          const map = {
-            missing_id: "يرجى إدخال الرقم الامتحاني",
-            stage_not_found: "الرقم لا ينتمي لأي مرحلة",
-            sheet_not_found: "لم يتم العثور على ورقة المرحلة المحددة",
-            empty_sheet: "الورقة فارغة أو غير جاهزة",
-            headers_missing: "عناوين الأعمدة غير مطابقة (تحقق من: الرقم الامتحاني، الاسم، ملاحظة/ملاحظات، حالة النتيجة)",
-            not_found: "الرقم غير موجود"
-          };
-          alert(map[data.error] || "تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات.");
-          return;
-        }
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJM3PrZ_vexsXzcZH2Ixhn1TzRbTMoNA7p-ZzvfFyVXPFJDN6zMAUfM5p0KzVH9A3K9A/exec";
 
-        document.getElementById("studentName").innerText = data.name || "---";
-        document.getElementById("examId").innerText = data.examId || examId;
+    function loadResult() {
+      const examId = document.getElementById("examInput").value.trim();
+      if (!examId) return alert("يرجى إدخال الرقم الامتحاني");
 
-        let stage = "---";
-        if (!isNaN(parseInt(examId, 10))) {
-          const num = parseInt(examId, 10);
-          if (num >= 455 && num <= 598) stage = "المرحلة الثانية";
-          else if (num >= 33 && num <= 453) stage = "المرحلة الثالثة";
-        }
-        document.getElementById("studentStage").innerText = stage;
+      fetch(`${SCRIPT_URL}?id=${encodeURIComponent(examId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert("خطأ: " + data.error);
+            return;
+          }
 
-        if (!data.subjects || data.subjects.length === 0) {
-          document.getElementById("subjectsTableWrapper").style.display = "none";
-          document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
-        } else {
-          const tableBody = document.getElementById("subjectsTable");
-          tableBody.innerHTML = "";
-          data.subjects.forEach(sub => {
-            const row = document.createElement("tr");
-            row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
-            tableBody.appendChild(row);
-          });
-          document.getElementById("subjectsTableWrapper").style.display = "table";
-          document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
-        }
+          document.getElementById("studentName").innerText = data.name || "---";
+          document.getElementById("examId").innerText = data.examId || examId;
 
-        document.getElementById("resultCard").style.display = "block";
-      })
-      .catch(() => alert("تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات."));
-  }
+          if (!data.subjects || data.subjects.length === 0) {
+            document.getElementById("subjectsTableWrapper").style.display = "none";
+            document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة";
+          } else {
+            const tableBody = document.getElementById("subjectsTable");
+            tableBody.innerHTML = "";
+            data.subjects.forEach(sub => {
+              const row = document.createElement("tr");
+              row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
+              tableBody.appendChild(row);
+            });
+            document.getElementById("subjectsTableWrapper").style.display = "table";
+            document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
+          }
 
-  function printResult() {
-    const printContents = document.getElementById("resultCard").innerHTML;
-    const originalContents = document.body.innerHTML;
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
-    location.reload();
-  }
-</script>
+          document.getElementById("resultCard").style.display = "block";
+        })
+        .catch(() => alert("تعذر جلب البيانات"));
+    }
+  </script>
+</body>
+</html>
