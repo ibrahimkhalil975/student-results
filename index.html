@@ -17,10 +17,10 @@
     th, td {border:1px solid #ccc;padding:8px;text-align:center;}
     th {background:#004080;color:#fff;}
     .note {color:red;font-weight:bold;margin-top:10px;}
-    .btn-group {display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
-    .btn {flex:1;padding:10px;border:none;border-radius:5px;cursor:pointer;font-size:16px;}
-    .btn-print {background:#28a745;color:#fff;}
+    .warning {color:#b30000;font-weight:bold;margin-top:15px;text-align:center;}
     footer {text-align:center;padding:15px;background:#eee;margin-top:20px;font-weight:bold;}
+    .btn {padding:10px;border:none;border-radius:5px;cursor:pointer;font-size:16px;background:#007bff;color:#fff;}
+    .btn:disabled {background:#999;cursor:not-allowed;}
   </style>
 </head>
 <body>
@@ -33,7 +33,7 @@
   <main>
     <h2>📋 أدخل رقمك الامتحاني لعرض النتيجة</h2>
     <input type="text" id="examInput" placeholder="رقم الامتحان">
-    <button id="searchBtn" onclick="loadResult()">عرض النتيجة</button>
+    <button id="searchBtn" class="btn" onclick="loadResult()">عرض النتيجة</button>
 
     <div id="resultCard" class="card" style="display:none;">
       <p>👤 الاسم: <span id="studentName">---</span></p>
@@ -46,15 +46,15 @@
 
       <p class="note">📌 ملاحظة: <span id="noteText">---</span></p>
 
-      <div class="btn-group">
-        <button class="btn btn-print" onclick="printResult()">🖨️ طباعة النتيجة</button>
-      </div>
+      <!-- رسالة تحذيرية -->
+      <p id="warningMsg" class="warning" style="display:none;">
+        ⚠️ لا يمكنك مشاهدة نتائج الآخرين، فقط نتيجتك
+      </p>
     </div>
   </main>
 
   <footer>
-       المهندس
-    إبراهيم خليل كامل
+    المهندس إبراهيم خليل كامل
   </footer>
 
   <script>
@@ -101,21 +101,13 @@
 
           document.getElementById("resultCard").style.display = "block";
 
-          // ✅ غلق البحث بعد عرض النتيجة
+          // ✅ غلق النظام بعد عرض النتيجة
           document.getElementById("examInput").disabled = true;
           document.getElementById("searchBtn").disabled = true;
           document.getElementById("searchBtn").innerText = "تم عرض نتيجتك";
+          document.getElementById("warningMsg").style.display = "block";
         })
         .catch(() => alert("تعذر جلب البيانات"));
-    }
-
-    function printResult() {
-      const printContents = document.getElementById("resultCard").innerHTML;
-      const originalContents = document.body.innerHTML;
-      document.body.innerHTML = printContents;
-      window.print();
-      document.body.innerHTML = originalContents;
-      location.reload();
     }
   </script>
 </body>
