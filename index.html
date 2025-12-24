@@ -46,7 +46,8 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzC_lzEzhZBKoT-ngSmkoHPX6PtSC1af19OUCkYTtJ4DEwcVYOP5kVIOKQJwiJR8cwNHQ/exec";
+    // رابط تطبيق الويب الجديد
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqJIRzb3k9btXmVnaR5YntMixsuX69HAms74UaeqzaXpGrqaaJyyxu7QgaxIuTJJ8e6g/exec";
 
     function loadResult() {
       const examId = document.getElementById("examInput").value.trim();
@@ -56,16 +57,22 @@
         .then(res => res.json())
         .then(data => {
           if (data.error) {
-            if (data.error === "not_found") alert("الرقم غير موجود");
-            else if (data.error === "stage_not_found") alert("الرقم لا ينتمي لأي مرحلة");
-            else alert("حدث خطأ في جلب البيانات");
+            const map = {
+              missing_id: "يرجى إدخال الرقم الامتحاني",
+              stage_not_found: "الرقم لا ينتمي لأي مرحلة",
+              sheet_not_found: "لم يتم العثور على ورقة المرحلة المحددة",
+              empty_sheet: "الورقة فارغة أو غير جاهزة",
+              headers_missing: "عناوين الأعمدة غير مطابقة (تحقق من: رقم الامتحان، الاسم، ملاحظة، حالة النتيجة)",
+              not_found: "الرقم غير موجود"
+            };
+            alert(map[data.error] || "تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات.");
             return;
           }
 
           document.getElementById("studentName").innerText = data.name || "---";
           document.getElementById("examId").innerText = data.examId || examId;
 
-          if (data.subjects.length === 0) {
+          if (!data.subjects || data.subjects.length === 0) {
             document.getElementById("subjectsTableWrapper").style.display = "none";
             document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
           } else {
@@ -82,10 +89,7 @@
 
           document.getElementById("resultCard").style.display = "block";
         })
-        .catch(err => {
-          console.error(err);
-          alert("تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات.");
-        });
+        .catch(() => alert("تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات."));
     }
   </script>
 </body>
