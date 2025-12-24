@@ -2,56 +2,36 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>جامعة الهادي - نتائج الطلاب</title>
+  <title>نتائج الطلاب</title>
   <style>
-    body {font-family:"Cairo","Tahoma",sans-serif;background:#f0f2f5;direction:rtl;margin:0;padding:0;}
-    .header {background:#002147;color:#fff;padding:20px;text-align:center;font-size:26px;font-weight:bold;}
-    .sub-header {background:#004080;color:#fff;padding:12px;text-align:center;font-size:18px;}
-    .input-section {text-align:center;margin:30px 0;}
-    input {padding:10px;width:250px;font-size:16px;border:1px solid #ccc;border-radius:5px;}
-    button {padding:10px 20px;font-size:16px;background:#004080;color:#fff;border:none;border-radius:5px;cursor:pointer;margin-right:10px;}
-    .card {background:#fff;margin:0 auto 30px;padding:25px;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,0.1);width:90%;max-width:700px;text-align:right;}
-    .student-info {font-size:18px;margin-bottom:20px;border-bottom:2px solid #eee;padding-bottom:10px;}
-    table {width:100%;border-collapse:collapse;margin-bottom:20px;}
-    th,td {border:1px solid #ccc;padding:10px;text-align:center;}
+    body {font-family:"Cairo","Tahoma",sans-serif;direction:rtl;background:#f0f0f0;padding:20px;}
+    input, button {padding:10px;font-size:16px;margin:5px;}
+    .card {background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);margin-top:20px;}
+    table {width:100%;border-collapse:collapse;margin-top:10px;}
+    th, td {border:1px solid #ccc;padding:8px;text-align:center;}
     th {background:#004080;color:#fff;}
-    .note {color:red;font-size:18px;text-align:center;font-weight:bold;margin-bottom:20px;}
-    .signature {font-size:16px;color:#555;text-align:left;padding-left:20px;}
-    .print-btn {background:#28a745;color:#fff;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;}
+    .note {color:red;font-weight:bold;margin-top:10px;}
   </style>
 </head>
 <body>
-  <div class="header">جامعة الهادي</div>
-  <div class="sub-header">الكلية التقنية الهندسية - قسم الأجهزة الطبية</div>
+  <h2>📋 أدخل رقمك الامتحاني لعرض النتيجة</h2>
+  <input type="text" id="examInput" placeholder="رقم الامتحان">
+  <button onclick="loadResult()">عرض النتيجة</button>
 
-  <div class="input-section">
-    <input type="text" id="examInput" placeholder="أدخل رقمك الامتحاني">
-    <button onclick="loadResult()">عرض النتيجة</button>
-  </div>
-
-  <div class="card" id="resultCard" style="display:none;">
-    <div class="student-info">
-      <p>الاسم: <span id="studentName">---</span></p>
-      <p>الرقم الامتحاني: <span id="examId">---</span></p>
-      <p>المرحلة: <span id="studentStage">---</span></p>
-    </div>
+  <div id="resultCard" class="card" style="display:none;">
+    <p>👤 الاسم: <span id="studentName">---</span></p>
+    <p>🆔 الرقم الامتحاني: <span id="examId">---</span></p>
 
     <table id="subjectsTableWrapper" style="display:none;">
-      <thead>
-        <tr><th>المادة</th><th>الدرجة</th></tr>
-      </thead>
+      <thead><tr><th>المادة</th><th>الدرجة</th></tr></thead>
       <tbody id="subjectsTable"></tbody>
     </table>
 
-    <div class="note">ملاحظة: <span id="noteText">---</span></div>
-    <div class="signature">المهندس إبراهيم خليل</div>
-    <div style="text-align:center;margin-top:20px;">
-      <button class="print-btn" onclick="printResult()">🖨️ طباعة النتيجة</button>
-    </div>
+    <p class="note">📌 ملاحظة: <span id="noteText">---</span></p>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxqJIRzb3k9btXmVnaR5YntMixsuX69HAms74UaeqzaXpGrqaaJyyxu7QgaxIuTJJ8e6g/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwna7gQznJwrcXBAfbCDjuGRfZW0yvqcLFTfFspXzBq6KWaPHnyO5haFxQ8trOlJ4w8/exec";
 
     function loadResult() {
       const examId = document.getElementById("examInput").value.trim();
@@ -65,8 +45,7 @@
               missing_id: "يرجى إدخال الرقم الامتحاني",
               stage_not_found: "الرقم لا ينتمي لأي مرحلة",
               sheet_not_found: "لم يتم العثور على ورقة المرحلة المحددة",
-              empty_sheet: "الورقة فارغة أو غير جاهزة",
-              headers_missing: "عناوين الأعمدة غير مطابقة (تحقق من: رقم الامتحان، الاسم، ملاحظة، حالة النتيجة)",
+              headers_missing: "عناوين الأعمدة غير مطابقة (تحقق من: الرقم الامتحاني، الاسم، ملاحظة/ملاحظات، حالة النتيجة)",
               not_found: "الرقم غير موجود"
             };
             alert(map[data.error] || "تعذر جلب البيانات. تأكد من نشر السكربت وضبط الصلاحيات.");
@@ -76,16 +55,25 @@
           document.getElementById("studentName").innerText = data.name || "---";
           document.getElementById("examId").innerText = data.examId || examId;
 
-          let stage = "---";
-          if (!isNaN(parseInt(examId, 10))) {
-            const num = parseInt(examId, 10);
-            if (num >= 455 && num <= 598) stage = "المرحلة الثانية";
-            else if (num >= 33 && num <= 453) stage = "المرحلة الثالثة";
-          }
-          document.getElementById("studentStage").innerText = stage;
-
+          const tableBody = document.getElementById("subjectsTable");
+          tableBody.innerHTML = "";
           if (!data.subjects || data.subjects.length === 0) {
             document.getElementById("subjectsTableWrapper").style.display = "none";
             document.getElementById("noteText").innerText = data.note || "⚠️ تم حجب النتيجة من قبل القسم، راجع القسم";
           } else {
-            const tableBody = document.getElement
+            data.subjects.forEach(sub => {
+              const row = document.createElement("tr");
+              row.innerHTML = `<td>${sub.name}</td><td>${sub.grade}</td>`;
+              tableBody.appendChild(row);
+            });
+            document.getElementById("subjectsTableWrapper").style.display = "table";
+            document.getElementById("noteText").innerText = data.note || "لا توجد ملاحظة";
+          }
+
+          document.getElementById("resultCard").style.display = "block";
+        })
+        .catch(() => alert("تعذر جلب البيانات"));
+    }
+  </script>
+</body>
+</html>
